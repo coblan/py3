@@ -1,16 +1,29 @@
 #!python3
+from __future__ import unicode_literals
 
 import os
 import re
+
+import logging
+logger = logging.getLogger(__name__)
 
 config={
     'entry':'',
     'out':'',
     'ext':['txt'],
-    'exclude':['']
+    'exclude':[''] 
 }
 
 def parse(config):
+    """
+    
+    @entry:dir root that src file inside it
+    @out:dir root that doc file should go to
+    @ext: aware extension that file will be process
+    @exclude : path to exclude
+    
+    .. Note:: 注意，程序不会扫描out和exclude中的文件夹
+    """
     entry=config.get('entry')
     #encode=config.get('encode','utf-8')
     out= os.path.normpath(config.get('out'))
@@ -37,9 +50,13 @@ def parse(config):
    
 def extrac_doc(file_path):
     with open(file_path,encoding='utf-8') as f:
-        print(file_path)
-        for mt in re.finditer('^\s*>>>([\w/\.]+)>(.+?)^\s*<<<<',f.read(),re.M|re.S ):
+        logger.debug(file_path)
+        find=False
+        for mt in re.finditer('^\s*>->([\w/\.]+)>(.+?)^\s*<-<',f.read(),re.M|re.S ):
             yield (mt.group(1), mt.group(2))
+            find=True
+        if find:
+            logger.info('[get doc] %s'%file_path)
         
 
 def doc_write(context):
