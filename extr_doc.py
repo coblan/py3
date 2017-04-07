@@ -39,10 +39,10 @@ def parse(config):
             mt = re.search('\.(\w+)$',f)
             if not config.get('ext') or \
                ( mt and mt.group(1) in config.get('ext')):
-                for k,v in extrac_doc(os.path.join(root,f)):
-                    path_key=os.path.join(out,k)
+                for order,file_name,v in extrac_doc(os.path.join(root,f)):
+                    path_key=os.path.join(out,file_name)
                     context[path_key] = context.get(path_key,[])
-                    context[path_key].append(v)                    
+                    context[path_key].append((order,v))                    
           
     doc_write(context)
 
@@ -52,15 +52,21 @@ def extrac_doc(file_path):
     with open(file_path,encoding='utf-8') as f:
         logger.debug(file_path)
         find=False
-        for mt in re.finditer('^\s*>->([\w/\.]+)>(.+?)^\s*<-<',f.read(),re.M|re.S ):
-            yield (mt.group(1), mt.group(2))
+        for mt in re.finditer('^\s*>([-\d])+>([\w/\.]+)>(.+?)^\s*<-<',f.read(),re.M|re.S ):
+            order=mt.group(1)
+            if order=='-':
+                order=0
+            order=int(order)
+            yield (order,mt.group(2), mt.group(3))
             find=True
         if find:
             logger.info('[get doc] %s'%file_path)
         
 
 def doc_write(context):
-    for path,v in context.items():
+    for path,value in context.items():
+        ls=sorted(value,key=lambda x: x[0])
+        v=[x[1] for x in ls]
         try:
             par = os.path.dirname(path)
             os.makedirs(par)
@@ -69,7 +75,9 @@ def doc_write(context):
         
         with open(path,'w',encoding='utf-8') as f:
             f.write(''.join(v))
-            
+    
+
+
 if __name__=='__main__':
     #extrac_doc('d:/try/doc/test1.txt')
     #config={
@@ -77,6 +85,7 @@ if __name__=='__main__':
         #'out':'d:/try/doc/gen',
         #'ext':['txt']
     #}
+    logging.basicConfig(level=logging.INFO)
     
     config={
      'entry':'d:/coblan/webcode',
