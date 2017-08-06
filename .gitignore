@@ -37,3 +37,4 @@ nosetests.xml
 .idea
 node_modules
 doc/build
+MNIST_dataa
