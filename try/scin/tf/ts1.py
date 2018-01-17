@@ -3,7 +3,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 x= np.linspace(-1, 1, num=100)
-y= 0.5*x +7
+noise = np.random.normal(size=x.size)
+y= 0.5*x +7 + noise
 #plt.plot(x,y)
 #plt.show()
 
@@ -12,6 +13,7 @@ y= 0.5*x +7
 
 x_i = tf.placeholder(tf.float32)
 y_i= tf.placeholder(tf.float32)
+
 
 w = tf.Variable(0,dtype=tf.float32)
 b = tf.Variable(0,dtype=tf.float32)
