@@ -11,7 +11,8 @@ def get_tokent():
 def get_data(): 
     access_token = get_tokent()
     url2 = "http://222.73.31.135:8084/api?access_token=%(access_token)s&handler=event&method=export" % {'access_token': access_token,}
-    
+    # status='新增'
+    # 
     data = {
         'project_id': '201804040003',
         'send_time': '2018-05-11',
@@ -43,4 +44,5 @@ def test_send_data():
     rt = requests.post(url, data = {'data': json.dumps( data)})
     print(rt.content)
 
-test_send_data()
+#test_send_data()
+get_data()
